@@ -44,7 +44,7 @@ try {
         }
 
     } elseif ($ext === 'pdf') {
-        $autoload = __DIR__ . '/../../vendor/autoload.php';
+        $autoload = __DIR__ . '/../vendor/autoload.php';
         if (!file_exists($autoload)) throw new Exception('vendor/autoload.php manquant');
         require_once $autoload;
         if (!class_exists('\Smalot\PdfParser\Parser')) {

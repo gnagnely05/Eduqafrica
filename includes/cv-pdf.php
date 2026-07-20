@@ -3,7 +3,7 @@
  * Génération PDF du CV via DomPDF.
  * Installation : composer require dompdf/dompdf
  */
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../public_html/vendor/autoload.php';
 
 use Dompdf\Dompdf;
 use Dompdf\Options;

@@ -3,24 +3,30 @@
 ## Structure du projet
 
 ```
-site/
-├── config/              ← HORS document root (protégé)
-│   ├── config.php       ← ⚙️ À CONFIGURER (clés API, BDD)
-│   └── database.php
-├── includes/            ← HORS document root
-│   ├── functions.php, auth.php, openrouter.php, moneroo.php
-│   ├── header.php, footer.php, cv-pdf.php
-├── cron/                ← HORS document root (CLI uniquement)
-│   ├── fetch_jobs.php
-│   └── fetch_scholarships.php
-├── public/              ← DOCUMENT ROOT (public_html)
-│   ├── index.php, chat.php, bourses.php, emplois.php...
-│   ├── admin/ (tableau de bord, contenu, design, articles, tarifs, messages)
-│   ├── api/ (chat-send.php, cv-chat.php, cv-extract.php, cv-save.php)
-│   └── assets/ (css, js)
-├── install.sql          ← Schéma de la base
-└── upgrade.sql          ← Mise à jour incrémentale (table settings)
+config/                  ← HORS document root (protégé)
+├── config.php           ← déjà configuré sur le serveur, ne pas écraser
+└── database.php
+includes/                ← HORS document root
+├── functions.php, auth.php, openrouter.php, moneroo.php
+├── header.php, footer.php, cv-pdf.php, admin-layout.php
+cron/                    ← HORS document root (CLI uniquement)
+├── fetch_jobs.php
+└── fetch_scholarships.php
+public_html/             ← DOCUMENT ROOT
+├── index.php, chat.php, bourses.php, emplois.php...
+├── admin/ (tableau de bord, contenu, design, articles, tarifs, messages)
+├── api/ (chat-send.php, cv-chat.php, cv-extract.php, cv-save.php)
+├── assets/ (css, js)
+├── composer.json
+└── vendor/ (généré par composer install, voir ci-dessous)
+install.sql              ← Schéma de la base
+upgrade.sql               ← Mise à jour incrémentale (table settings)
 ```
+
+`config/`, `cron/`, `includes/` et `public_html/` sont tous au même niveau
+(frères), à la racine du site sur Hostinger — c'est cette disposition qui
+permet aux chemins relatifs du code (`../config/...`, `../includes/...`) de
+fonctionner correctement.
 
 ## Étapes de déploiement
 
@@ -28,38 +34,29 @@ site/
 1. hPanel > **Bases de données MySQL** > créer une base + un utilisateur
 2. Ouvrir **phpMyAdmin** > sélectionner la base > **Importer** > `install.sql`
 
-### 2. Fichiers
-1. Uploader tout le dossier via le **Gestionnaire de fichiers** ou FTP :
-   - `config/`, `includes/`, `cron/` → dans `/home/USER/` (au-dessus de public_html)
-   - contenu de `public/` → dans `public_html/`
-2. **OU** garder la structure telle quelle et pointer le document root du domaine
-   vers le dossier `public/` (hPanel > Domaines > document root) — recommandé.
+### 2. Configuration
+`config/config.php` est déjà configuré sur le serveur avec les identifiants
+réels (BDD, etc.) — ne pas l'écraser lors d'un déploiement. Les clés
+`OPENROUTER_API_KEY` et `MONEROO_SECRET_KEY` peuvent être ajoutées plus tard
+sans bloquer l'affichage du site.
 
-### 3. Configuration
-Éditer `config/config.php` :
-- `SITE_NAME`, `SITE_URL`, `SITE_EMAIL`
-- Identifiants MySQL (`DB_NAME`, `DB_USER`, `DB_PASS`)
-- `OPENROUTER_API_KEY` → créer sur https://openrouter.ai/keys et créditer ~5-10 $
-- `MONEROO_SECRET_KEY` → dashboard https://moneroo.io après validation du compte
-
-### 4. DomPDF (génération des CV en PDF)
-En SSH (hPanel > Avancé > SSH) :
+### 3. DomPDF (génération des CV en PDF)
+`vendor/` doit se trouver **à l'intérieur de `public_html/`** (au même niveau
+que `admin/`, `api/`, `assets/`), car `composer.json` s'y trouve. En SSH
+(hPanel > Avancé > SSH) :
 ```bash
-cd /home/USER/chemin-du-site
-composer require dompdf/dompdf
+cd /home/USER/chemin-du-site/public_html
+composer install
 ```
-Le dossier `vendor/` doit être au même niveau que `includes/` (le code fait
-`require __DIR__ . '/../vendor/autoload.php'`). Sans SSH : installer en local
-puis uploader `vendor/` par FTP.
+Sans SSH : installer en local (`composer install` dans `public_html/`) puis
+uploader le dossier `vendor/` généré par FTP.
 
-Lecture des PDF uploadés (assistant CV) : en SSH →
-```bash
-composer require smalot/pdfparser
-```
-Sans ça, l'upload PDF affichera un message invitant à envoyer en .docx/.txt
-(le reste fonctionne).
+Lecture des PDF uploadés (assistant CV) : `composer.json` inclut déjà
+`smalot/pdfparser`, `composer install` l'installe automatiquement. Sans ça,
+l'upload PDF affichera un message invitant à envoyer en .docx/.txt (le reste
+fonctionne).
 
-### 5. Crons (hPanel > Avancé > Tâches Cron)
+### 4. Crons (hPanel > Avancé > Tâches Cron)
 ```
 0 6 * * 1    php /home/USER/chemin/cron/fetch_jobs.php
 30 6 * * 1   php /home/USER/chemin/cron/fetch_scholarships.php
@@ -67,14 +64,14 @@ Sans ça, l'upload PDF affichera un message invitant à envoyer en .docx/.txt
 (Tous les lundis à 6h00 et 6h30. Tester d'abord manuellement en SSH :
 `php cron/fetch_jobs.php`)
 
-### 6. Compte admin
+### 5. Compte admin
 S'inscrire normalement sur le site, puis en phpMyAdmin :
 ```sql
 UPDATE users SET role = 'admin' WHERE email = 'ton@email.ci';
 ```
 Puis va sur `https://ton-site/admin/`.
 
-### 7. Vérifications avant AdSense
+### 6. Vérifications avant AdSense
 - [ ] 15-20 articles de blog originaux publiés
 - [ ] Pages À propos / Contact / Confidentialité complétées (remplacer les [À COMPLÉTER])
 - [ ] Domaine avec HTTPS actif
