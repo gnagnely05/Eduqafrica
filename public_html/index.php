@@ -45,21 +45,39 @@ $ebImage = setting('eb_image_url', '');
     <div class="solutions-grid">
 
       <div class="solution-card">
-        <div class="icon">⚡</div>
+        <div class="icon">
+          <?php if ($sol1Image = setting('sol1_image', '')): ?>
+            <img src="<?= e($sol1Image) ?>" alt="">
+          <?php else: ?>
+            ⚡
+          <?php endif; ?>
+        </div>
         <h3><?= e(setting('sol1_title', 'Orientation sur-mesure')) ?></h3>
         <p><?= e(setting('sol1_text', '')) ?></p>
         <a href="/chat.php" class="btn btn-outline btn-block">Plus</a>
       </div>
 
       <div class="solution-card">
-        <div class="icon">📝</div>
+        <div class="icon">
+          <?php if ($sol2Image = setting('sol2_image', '')): ?>
+            <img src="<?= e($sol2Image) ?>" alt="">
+          <?php else: ?>
+            📝
+          <?php endif; ?>
+        </div>
         <h3><?= e(setting('sol2_title', 'Générateur de CV Pro')) ?></h3>
         <p><?= e(setting('sol2_text', '')) ?></p>
         <a href="/cv-assistant.php" class="btn btn-primary btn-block">Créer mon CV</a>
       </div>
 
       <div class="solution-card">
-        <div class="icon">🎓</div>
+        <div class="icon">
+          <?php if ($sol3Image = setting('sol3_image', '')): ?>
+            <img src="<?= e($sol3Image) ?>" alt="">
+          <?php else: ?>
+            🎓
+          <?php endif; ?>
+        </div>
         <h3><?= e(setting('sol3_title', "Bourses d'études vérifiées")) ?></h3>
         <p><?= e(setting('sol3_text', '')) ?></p>
         <a href="/bourses.php" class="btn btn-outline btn-block">Voir les bourses</a>

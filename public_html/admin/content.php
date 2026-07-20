@@ -15,10 +15,13 @@ $textFields = [
     'Section "Nos outils"' => [
         'solutions_title' => ['Titre de section', 'text'],
         'solutions_subtitle' => ['Sous-titre', 'textarea'],
+        'sol1_image' => ['Carte 1 — image (URL depuis la Médiathèque)', 'text'],
         'sol1_title' => ['Carte 1 — titre', 'text'],
         'sol1_text' => ['Carte 1 — texte', 'textarea'],
+        'sol2_image' => ['Carte 2 — image (URL depuis la Médiathèque)', 'text'],
         'sol2_title' => ['Carte 2 — titre', 'text'],
         'sol2_text' => ['Carte 2 — texte', 'textarea'],
+        'sol3_image' => ['Carte 3 — image (URL depuis la Médiathèque)', 'text'],
         'sol3_title' => ['Carte 3 — titre', 'text'],
         'sol3_text' => ['Carte 3 — texte', 'textarea'],
     ],
@@ -68,6 +71,7 @@ adminHeader('Contenu de la page d\'accueil');
 <?php if ($saved): ?><div class="alert-success">✅ Contenu mis à jour — visible immédiatement sur le site.</div><?php endif; ?>
 
 <p style="margin-bottom:20px;"><a href="/" target="_blank" class="btn btn-sm">Voir la page d'accueil ↗</a>
+<a href="/admin/media.php" class="btn btn-sm" style="margin-left:8px;">🖼️ Médiathèque →</a>
 <a href="/admin/design.php" class="btn btn-sm btn-amber" style="margin-left:8px;">🎨 Couleurs &amp; polices →</a></p>
 
 <form method="post">

@@ -13,6 +13,7 @@ function adminHeader(string $title): void
     $nav = [
         'index.php'    => '📊 Tableau de bord',
         'content.php'  => '✏️ Contenu accueil',
+        'media.php'    => '🖼️ Médiathèque',
         'design.php'   => '🎨 Couleurs & polices',
         'articles.php' => '📝 Articles',
         'settings.php' => '⚙️ Tarifs & codes',
