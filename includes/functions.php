@@ -99,3 +99,72 @@ function xof(int $amount): string
 {
     return number_format($amount, 0, ',', ' ') . ' F';
 }
+
+// ---- Médiathèque (images uploadées depuis l'admin) ----
+
+define('UPLOAD_DIR_PATH', __DIR__ . '/../public_html/assets/uploads');
+define('UPLOAD_URL_PATH', '/assets/uploads');
+define('UPLOAD_MAX_SIZE', 3 * 1024 * 1024); // 3 Mo
+
+/** Valide et enregistre une image uploadée. Retourne ['ok', 'url', 'error']. */
+function saveUploadedImage(array $file): array
+{
+    $allowedExt = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+
+    if (!is_dir(UPLOAD_DIR_PATH)) {
+        mkdir(UPLOAD_DIR_PATH, 0755, true);
+    }
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        return ['ok' => false, 'url' => null, 'error' => "Erreur d'upload (code {$file['error']})."];
+    }
+    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    if (!in_array($ext, $allowedExt, true)) {
+        return ['ok' => false, 'url' => null, 'error' => 'Format non autorisé. Utilise : ' . implode(', ', $allowedExt) . '.'];
+    }
+    if ($file['size'] > UPLOAD_MAX_SIZE) {
+        return ['ok' => false, 'url' => null, 'error' => 'Image trop lourde (3 Mo max).'];
+    }
+    if (!@getimagesize($file['tmp_name'])) {
+        return ['ok' => false, 'url' => null, 'error' => "Ce fichier n'est pas une image valide."];
+    }
+
+    $baseName = slugify(pathinfo($file['name'], PATHINFO_FILENAME));
+    $filename = $baseName . '-' . substr(bin2hex(random_bytes(4)), 0, 8) . '.' . $ext;
+
+    if (!move_uploaded_file($file['tmp_name'], UPLOAD_DIR_PATH . '/' . $filename)) {
+        return ['ok' => false, 'url' => null, 'error' => "Impossible d'enregistrer l'image sur le serveur."];
+    }
+
+    return ['ok' => true, 'url' => UPLOAD_URL_PATH . '/' . $filename, 'error' => null];
+}
+
+/** Liste les images de la médiathèque, plus récentes en premier. */
+function listUploadedImages(): array
+{
+    if (!is_dir(UPLOAD_DIR_PATH)) {
+        return [];
+    }
+    $images = [];
+    foreach (glob(UPLOAD_DIR_PATH . '/*') as $path) {
+        if (is_file($path)) {
+            $images[] = [
+                'name' => basename($path),
+                'url'  => UPLOAD_URL_PATH . '/' . basename($path),
+                'time' => filemtime($path),
+            ];
+        }
+    }
+    usort($images, fn($a, $b) => $b['time'] - $a['time']);
+    return $images;
+}
+
+/** Supprime une image de la médiathèque par nom de fichier (protégé contre le path traversal). */
+function deleteUploadedImage(string $filename): bool
+{
+    $target = basename($filename);
+    $path = UPLOAD_DIR_PATH . '/' . $target;
+    if ($target === '' || !is_file($path) || dirname(realpath($path)) !== realpath(UPLOAD_DIR_PATH)) {
+        return false;
+    }
+    return unlink($path);
+}
