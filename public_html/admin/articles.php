@@ -87,8 +87,11 @@ adminHeader('Articles du blog');
     </div>
     <div class="form-group"><label>Extrait (méta description, ~150 caractères)</label>
       <input class="form-control" name="excerpt" maxlength="500" value="<?= e($editing['excerpt'] ?? '') ?>"></div>
-    <div class="form-group"><label>Contenu (HTML : &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;strong&gt;…)</label>
-      <textarea class="form-control" name="content" rows="18" required><?= e($editing['content'] ?? '') ?></textarea></div>
+    <div class="form-group">
+      <label>Contenu</label>
+      <div id="articleEditor" style="background:#fff; min-height:340px; border-radius:0 0 9px 9px;"><?= $editing['content'] ?? '' ?></div>
+      <textarea name="content" id="contentField" required style="display:none;"><?= e($editing['content'] ?? '') ?></textarea>
+    </div>
     <button class="btn btn-primary">Enregistrer</button>
     <a href="/admin/articles.php" class="btn btn-danger" style="margin-left:8px;">Annuler</a>
     <?php if ($editing && $editing['status'] === 'published'): ?>
@@ -96,6 +99,57 @@ adminHeader('Articles du blog');
     <?php endif; ?>
   </form>
 </div>
+
+<link href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
+<script>
+const quill = new Quill('#articleEditor', {
+  theme: 'snow',
+  placeholder: 'Rédige ton article ici…',
+  modules: {
+    toolbar: [
+      [{ header: [2, 3, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ size: ['small', false, 'large', 'huge'] }],
+      [{ color: [] }, { background: [] }],
+      [{ list: 'ordered' }, { list: 'bullet' }],
+      [{ align: [] }],
+      ['blockquote', 'link', 'image'],
+      ['clean'],
+    ],
+  },
+});
+
+quill.getModule('toolbar').addHandler('image', function () {
+  const input = document.createElement('input');
+  input.setAttribute('type', 'file');
+  input.setAttribute('accept', 'image/*');
+  input.click();
+  input.onchange = async () => {
+    const file = input.files[0];
+    if (!file) return;
+    const fd = new FormData();
+    fd.append('image', file);
+    try {
+      const res = await fetch('/admin/upload-image.php', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (data.ok) {
+        const range = quill.getSelection(true) || { index: quill.getLength() };
+        quill.insertEmbed(range.index, 'image', data.url, 'user');
+        quill.setSelection(range.index + 1);
+      } else {
+        alert(data.error || "Erreur lors de l'envoi de l'image.");
+      }
+    } catch (e) {
+      alert('Connexion impossible, réessaie.');
+    }
+  };
+});
+
+document.querySelector('#contentField').closest('form').addEventListener('submit', () => {
+  document.querySelector('#contentField').value = quill.root.innerHTML;
+});
+</script>
 <?php else: ?>
 <p style="margin-bottom:18px;"><a href="?new=1" class="btn btn-amber">+ Nouvel article</a></p>
 <?php endif; ?>

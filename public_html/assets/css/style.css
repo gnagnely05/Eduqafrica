@@ -186,6 +186,16 @@ textarea.form-control { resize: vertical; min-height: 120px; }
 }
 .eyebrow { font-size: 0.92rem; color: var(--text-light); margin-bottom: 8px; display: inline-block; }
 .article-body h2 { margin-top: 1.2em; }
+.article-body img { border-radius: var(--radius); margin: 1.2em 0; }
+.article-body blockquote { border-left: 3px solid var(--coral); padding-left: 16px; color: var(--text-light); margin: 1.2em 0; }
+.article-body .ql-align-center { text-align: center; }
+.article-body .ql-align-right { text-align: right; }
+.article-body .ql-align-justify { text-align: justify; }
+.article-body .ql-size-small { font-size: 0.75em; }
+.article-body .ql-size-large { font-size: 1.5em; }
+.article-body .ql-size-huge { font-size: 2.5em; }
+.article-body .ql-indent-1 { padding-left: 3em; }
+.article-body .ql-indent-2 { padding-left: 6em; }
 .form-narrow { max-width: 480px; margin: 60px auto; padding: 0 20px; }
 .btn-coral { background: var(--coral); color: #fff; }
 .btn-amber { background: var(--coral); color: var(--near-black); }
