@@ -13,7 +13,7 @@ if ($catSlug !== '') {
 }
 
 $stmt = db()->prepare(
-    "SELECT a.title, a.slug, a.excerpt, a.published_at, c.name AS cat_name, c.slug AS cat_slug
+    "SELECT a.title, a.slug, a.excerpt, a.featured_image, a.published_at, c.name AS cat_name, c.slug AS cat_slug
      FROM articles a LEFT JOIN categories c ON c.id = a.category_id
      WHERE $where ORDER BY a.published_at DESC LIMIT 30"
 );
@@ -36,14 +36,17 @@ $cats = db()->query('SELECT name, slug FROM categories ORDER BY name')->fetchAll
   <?php if (!$articles): ?>
     <div class="card" style="text-align:center; padding:48px;"><p>Les premiers articles arrivent très bientôt.</p></div>
   <?php else: ?>
-  <div class="grid-3">
+  <div class="articles-grid">
     <?php foreach ($articles as $a): ?>
-    <div class="card">
+    <a href="/article.php?slug=<?= e($a['slug']) ?>" class="article-card" style="display:block;">
+      <?php if ($a['featured_image']): ?>
+        <img src="<?= e($a['featured_image']) ?>" alt="" class="article-card-img">
+      <?php endif; ?>
       <?php if ($a['cat_name']): ?><span class="badge"><?= e($a['cat_name']) ?></span><?php endif; ?>
-      <h3 style="margin-top:8px;"><a href="/article.php?slug=<?= e($a['slug']) ?>" style="text-decoration:none;"><?= e($a['title']) ?></a></h3>
+      <h3 style="margin-top:8px;"><?= e($a['title']) ?></h3>
       <p class="meta"><?= dateFr($a['published_at']) ?></p>
-      <p style="font-size:.94rem;"><?= e($a['excerpt'] ?? '') ?></p>
-    </div>
+      <p><?= e($a['excerpt'] ?? '') ?></p>
+    </a>
     <?php endforeach; ?>
   </div>
   <?php endif; ?>

@@ -26,6 +26,10 @@ require_once __DIR__ . '/../includes/header.php';
     <h1 style="margin:10px 0 6px;"><?= e($a['title']) ?></h1>
     <p class="meta" style="margin-bottom:28px;">Publié le <?= dateFr($a['published_at']) ?></p>
 
+    <?php if ($a['featured_image']): ?>
+      <img src="<?= e($a['featured_image']) ?>" alt="" class="article-featured-img">
+    <?php endif; ?>
+
     <?php /* Emplacement publicité AdSense (in-article) — à activer après approbation */ ?>
 
     <div><?= $a['content'] /* HTML rédigé via l'admin — auteur de confiance */ ?></div>

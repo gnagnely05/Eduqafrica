@@ -55,13 +55,17 @@ $fontsParam  = implode('&family=', array_map(
       </svg>
       <span><?= e(SITE_NAME) ?></span>
     </a>
+    <?php
+    $currentPage = basename($_SERVER['SCRIPT_NAME']);
+    $navActive = fn(string $page) => $currentPage === $page ? 'active' : '';
+    ?>
     <nav class="main-nav" id="mainNav">
-      <a href="/" class="<?= basename($_SERVER['SCRIPT_NAME']) === 'index.php' ? 'active' : '' ?>">Accueil</a>
-      <a href="/chat.php">Orientation IA</a>
-      <a href="/cv-assistant.php">Générateur de CV</a>
-      <a href="/bourses.php">Bourses d'Études</a>
-      <a href="/emplois.php">Offres d'emploi</a>
-      <a href="/blog.php">Guides et conseils</a>
+      <a href="/" class="<?= $navActive('index.php') ?>">Accueil</a>
+      <a href="/chat.php" class="<?= $navActive('chat.php') ?>">Orientation IA</a>
+      <a href="/cv-assistant.php" class="<?= $navActive('cv-assistant.php') . ' ' . $navActive('cv-generator.php') . ' ' . $navActive('cv-preview.php') ?>">Générateur de CV</a>
+      <a href="/bourses.php" class="<?= $navActive('bourses.php') . ' ' . $navActive('bourse.php') ?>">Bourses d'Études</a>
+      <a href="/emplois.php" class="<?= $navActive('emplois.php') . ' ' . $navActive('emploi.php') ?>">Offres d'emploi</a>
+      <a href="/blog.php" class="<?= $navActive('blog.php') . ' ' . $navActive('article.php') ?>">Guides et conseils</a>
     </nav>
     <div class="header-actions">
       <?php if ($user): ?>

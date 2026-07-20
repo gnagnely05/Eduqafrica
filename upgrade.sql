@@ -54,3 +54,8 @@ INSERT IGNORE INTO settings (skey, svalue) VALUES
 ('font_nav', 'DM Sans'),
 ('font_body', 'IBM Plex Sans');
 INSERT IGNORE INTO settings (skey, svalue) VALUES ('contact_email', '');
+
+-- ---------- v6 : image mise en avant des articles ----------
+-- Si la colonne existe déjà, cette ligne renverra une erreur "Duplicate column
+-- name" que tu peux ignorer sans risque.
+ALTER TABLE articles ADD COLUMN featured_image VARCHAR(500) NULL AFTER excerpt;

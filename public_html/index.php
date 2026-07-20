@@ -10,7 +10,7 @@ $bourses = db()->query(
 )->fetchAll();
 
 $articles = db()->query(
-    "SELECT title, slug, excerpt, published_at FROM articles
+    "SELECT title, slug, excerpt, featured_image, published_at FROM articles
      WHERE status = 'published' ORDER BY published_at DESC LIMIT 3"
 )->fetchAll();
 
@@ -162,11 +162,14 @@ $ebImage = setting('eb_image_url', '');
     </div>
     <div class="articles-grid">
       <?php foreach ($articles as $a): ?>
-      <div class="article-card">
+      <a href="/article.php?slug=<?= e($a['slug']) ?>" class="article-card" style="display:block;">
+        <?php if ($a['featured_image']): ?>
+          <img src="<?= e($a['featured_image']) ?>" alt="" class="article-card-img">
+        <?php endif; ?>
         <p class="meta"><?= dateFr($a['published_at']) ?></p>
-        <h3><a href="/article.php?slug=<?= e($a['slug']) ?>"><?= e($a['title']) ?></a></h3>
+        <h3><?= e($a['title']) ?></h3>
         <p><?= e(mb_substr($a['excerpt'] ?? $a['title'], 0, 110)) ?>…</p>
-      </div>
+      </a>
       <?php endforeach; ?>
     </div>
   </div>

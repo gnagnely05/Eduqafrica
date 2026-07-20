@@ -12,6 +12,8 @@ if (($_GET['action'] ?? '') === 'delete' && csrfCheck($_GET['csrf'] ?? null)) {
 }
 
 // ---- Sauvegarde (création ou édition) ----
+$uploadError = null;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrfCheck($_POST['csrf'] ?? null)) {
     $id       = (int)($_POST['id'] ?? 0);
     $title    = trim($_POST['title'] ?? '');
@@ -19,22 +21,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrfCheck($_POST['csrf'] ?? null)) 
     $excerpt  = trim($_POST['excerpt'] ?? '');
     $content  = $_POST['content'] ?? '';
     $status   = ($_POST['status'] ?? 'draft') === 'published' ? 'published' : 'draft';
+    $featuredImage = trim($_POST['featured_image'] ?? '');
+
+    if (!empty($_FILES['featured_image_file']) && $_FILES['featured_image_file']['error'] !== UPLOAD_ERR_NO_FILE) {
+        $res = saveUploadedImage($_FILES['featured_image_file']);
+        if ($res['ok']) {
+            $featuredImage = $res['url'];
+        } else {
+            $uploadError = $res['error'];
+        }
+    }
 
     if ($title !== '' && $content !== '') {
         if ($id) {
             $stmt = $pdo->prepare(
-                "UPDATE articles SET title=?, category_id=?, excerpt=?, content=?, status=?,
+                "UPDATE articles SET title=?, category_id=?, excerpt=?, featured_image=?, content=?, status=?,
                  published_at = IF(? = 'published' AND published_at IS NULL, NOW(), published_at)
                  WHERE id=?"
             );
-            $stmt->execute([$title, $catId, $excerpt, $content, $status, $status, $id]);
+            $stmt->execute([$title, $catId, $excerpt, $featuredImage ?: null, $content, $status, $status, $id]);
         } else {
             $slug = uniqueSlug($pdo, 'articles', slugify($title));
             $stmt = $pdo->prepare(
-                "INSERT INTO articles (category_id, title, slug, excerpt, content, status, published_at)
-                 VALUES (?, ?, ?, ?, ?, ?, IF(? = 'published', NOW(), NULL))"
+                "INSERT INTO articles (category_id, title, slug, excerpt, featured_image, content, status, published_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, IF(? = 'published', NOW(), NULL))"
             );
-            $stmt->execute([$catId, $title, $slug, $excerpt, $content, $status, $status]);
+            $stmt->execute([$catId, $title, $slug, $excerpt, $featuredImage ?: null, $content, $status, $status]);
             $id = (int)$pdo->lastInsertId();
         }
         redirect('/admin/articles.php?saved=1&edit=' . $id);
@@ -51,6 +63,7 @@ if ($editId) {
 }
 $showForm = $editing || isset($_GET['new']);
 
+$mediaImages = listUploadedImages();
 $cats = $pdo->query('SELECT id, name FROM categories ORDER BY name')->fetchAll();
 $articles = $pdo->query(
     "SELECT a.id, a.title, a.slug, a.status, a.views, a.published_at, c.name AS cat
@@ -62,11 +75,12 @@ adminHeader('Articles du blog');
 ?>
 
 <?php if ($saved): ?><div class="alert-success">✅ Article enregistré.</div><?php endif; ?>
+<?php if ($uploadError): ?><div class="alert-success" style="background:#FDEDEA; color:#8C2F1B;">❌ <?= e($uploadError) ?></div><?php endif; ?>
 
 <?php if ($showForm): ?>
 <div class="panel">
   <h2><?= $editing ? 'Modifier : ' . e($editing['title']) : 'Nouvel article' ?></h2>
-  <form method="post">
+  <form method="post" enctype="multipart/form-data">
     <input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>">
     <input type="hidden" name="id" value="<?= $editing ? (int)$editing['id'] : 0 ?>">
     <div class="form-group"><label>Titre *</label>
@@ -87,6 +101,23 @@ adminHeader('Articles du blog');
     </div>
     <div class="form-group"><label>Extrait (méta description, ~150 caractères)</label>
       <input class="form-control" name="excerpt" maxlength="500" value="<?= e($editing['excerpt'] ?? '') ?>"></div>
+    <div class="form-group">
+      <label>Image mise en avant (affichée sur les cartes du blog et en tête d'article)</label>
+      <div style="display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;">
+        <?php if ($editing['featured_image'] ?? ''): ?>
+          <img src="<?= e($editing['featured_image']) ?>" alt="" style="width:120px; height:80px; object-fit:cover; border-radius:8px; border:1px solid var(--line);">
+        <?php endif; ?>
+        <div style="flex:1; min-width:220px;">
+          <select class="form-control" name="featured_image" style="margin-bottom:8px;">
+            <option value="">— Aucune —</option>
+            <?php foreach ($mediaImages as $img): ?>
+              <option value="<?= e($img['url']) ?>" <?= ($editing['featured_image'] ?? '') === $img['url'] ? 'selected' : '' ?>><?= e($img['name']) ?></option>
+            <?php endforeach; ?>
+          </select>
+          <input class="form-control" type="file" name="featured_image_file" accept=".jpg,.jpeg,.png,.webp,.gif">
+        </div>
+      </div>
+    </div>
     <div class="form-group">
       <label>Contenu</label>
       <div id="articleEditor" style="background:#fff; min-height:340px; border-radius:0 0 9px 9px;"><?= $editing['content'] ?? '' ?></div>

@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS articles (
   title VARCHAR(255) NOT NULL,
   slug VARCHAR(280) NOT NULL UNIQUE,
   excerpt VARCHAR(500) NULL,
+  featured_image VARCHAR(500) NULL,
   content MEDIUMTEXT NOT NULL,
   status ENUM('draft','published') NOT NULL DEFAULT 'draft',
   views INT UNSIGNED NOT NULL DEFAULT 0,
