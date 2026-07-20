@@ -121,7 +121,7 @@ adminHeader('Articles du blog');
     <div class="form-group">
       <label>Contenu</label>
       <div id="articleEditor" style="background:#fff; min-height:340px; border-radius:0 0 9px 9px;"><?= $editing['content'] ?? '' ?></div>
-      <textarea name="content" id="contentField" required style="display:none;"><?= e($editing['content'] ?? '') ?></textarea>
+      <textarea name="content" id="contentField" style="display:none;"><?= e($editing['content'] ?? '') ?></textarea>
     </div>
     <button class="btn btn-primary">Enregistrer</button>
     <a href="/admin/articles.php" class="btn btn-danger" style="margin-left:8px;">Annuler</a>
@@ -177,7 +177,12 @@ quill.getModule('toolbar').addHandler('image', function () {
   };
 });
 
-document.querySelector('#contentField').closest('form').addEventListener('submit', () => {
+document.querySelector('#contentField').closest('form').addEventListener('submit', (e) => {
+  if (quill.getText().trim() === '') {
+    e.preventDefault();
+    alert('Le contenu de l\'article ne peut pas être vide.');
+    return;
+  }
   document.querySelector('#contentField').value = quill.root.innerHTML;
 });
 </script>
