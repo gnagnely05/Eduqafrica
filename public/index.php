@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/functions.php';
 $pageTitle = setting('hero_title', "L'orientation et l'emploi gratuits");
 require_once __DIR__ . '/../includes/header.php';
 
