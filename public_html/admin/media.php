@@ -38,7 +38,7 @@ adminHeader('Médiathèque');
   <form method="post" enctype="multipart/form-data">
     <input type="hidden" name="csrf" value="<?= e(csrfToken()) ?>">
     <div class="form-group">
-      <label>Fichier (JPG, PNG, WEBP ou GIF — 3 Mo max)</label>
+      <label>Fichier (JPG, PNG, WEBP ou GIF — 8 Mo max)</label>
       <input class="form-control" type="file" name="image" accept=".jpg,.jpeg,.png,.webp,.gif" required>
     </div>
     <button class="btn btn-primary">📤 Envoyer</button>

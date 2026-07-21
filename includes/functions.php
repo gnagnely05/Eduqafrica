@@ -104,7 +104,7 @@ function xof(int $amount): string
 
 define('UPLOAD_DIR_PATH', __DIR__ . '/../public_html/assets/uploads');
 define('UPLOAD_URL_PATH', '/assets/uploads');
-define('UPLOAD_MAX_SIZE', 3 * 1024 * 1024); // 3 Mo
+define('UPLOAD_MAX_SIZE', 8 * 1024 * 1024); // 8 Mo
 
 /** Valide et enregistre une image uploadée. Retourne ['ok', 'url', 'error']. */
 function saveUploadedImage(array $file): array
@@ -122,7 +122,7 @@ function saveUploadedImage(array $file): array
         return ['ok' => false, 'url' => null, 'error' => 'Format non autorisé. Utilise : ' . implode(', ', $allowedExt) . '.'];
     }
     if ($file['size'] > UPLOAD_MAX_SIZE) {
-        return ['ok' => false, 'url' => null, 'error' => 'Image trop lourde (3 Mo max).'];
+        return ['ok' => false, 'url' => null, 'error' => 'Image trop lourde (8 Mo max).'];
     }
     if (!@getimagesize($file['tmp_name'])) {
         return ['ok' => false, 'url' => null, 'error' => "Ce fichier n'est pas une image valide."];
