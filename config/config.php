@@ -26,7 +26,7 @@ define('DB_PASS', 'CHANGE_ME');
 
 // ---- OpenRouter ----
 define('OPENROUTER_API_KEY', 'CHANGE_ME');         // https://openrouter.ai/keys
-define('OPENROUTER_MODEL_CHAT', 'anthropic/claude-3.5-haiku');
+define('OPENROUTER_MODEL_CHAT', 'anthropic/claude-haiku-4.5');
 define('OPENROUTER_MODEL_SEARCH', 'perplexity/sonar');
 // Astuce : suffixe ":online" pour activer la recherche web sur n'importe quel modèle.
 
