@@ -1,6 +1,10 @@
 <?php
 /**
  * Configuration générale — Plateforme d'orientation
+ *
+ * Copie ce fichier en config.php sur le serveur et renseigne les vraies
+ * valeurs. config.php n'est PAS suivi par Git : il ne sera jamais écrasé
+ * ni supprimé par un déploiement.
  */
 
 // ---- Site ----

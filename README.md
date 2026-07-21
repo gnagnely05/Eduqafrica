@@ -35,8 +35,12 @@ fonctionner correctement.
 2. Ouvrir **phpMyAdmin** > sélectionner la base > **Importer** > `install.sql`
 
 ### 2. Configuration
-`config/config.php` est déjà configuré sur le serveur avec les identifiants
-réels (BDD, etc.) — ne pas l'écraser lors d'un déploiement. Les clés
+`config/config.php` **n'est pas suivi par Git** (voir `.gitignore`) : un
+déploiement ne le touche jamais, ni ne le supprime. Sur un nouveau serveur,
+copie `config/config.example.php` en `config/config.php` et renseigne les
+vraies valeurs (BDD, etc.). Sur ce site, il est déjà configuré sur le serveur
+— pour changer un réglage (ex. le modèle IA), édite-le directement via le
+Gestionnaire de fichiers Hostinger, jamais via Git. Les clés
 `OPENROUTER_API_KEY` et `MONEROO_SECRET_KEY` peuvent être ajoutées plus tard
 sans bloquer l'affichage du site.
 
