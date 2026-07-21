@@ -36,19 +36,24 @@ try {
 
         if ($title !== '' && $content !== '') {
             if ($id) {
+                $stmt = $pdo->prepare('SELECT published_at FROM articles WHERE id = ?');
+                $stmt->execute([$id]);
+                $currentPublishedAt = $stmt->fetchColumn();
+                $publishedAt = ($status === 'published' && !$currentPublishedAt) ? date('Y-m-d H:i:s') : $currentPublishedAt;
+
                 $stmt = $pdo->prepare(
-                    "UPDATE articles SET title=?, category_id=?, excerpt=?, featured_image=?, content=?, status=?,
-                     published_at = IF(? = 'published' AND published_at IS NULL, NOW(), published_at)
-                     WHERE id=?"
+                    'UPDATE articles SET title=?, category_id=?, excerpt=?, featured_image=?, content=?, status=?, published_at=?
+                     WHERE id=?'
                 );
-                $stmt->execute([$title, $catId, $excerpt, $featuredImage ?: null, $content, $status, $status, $id]);
+                $stmt->execute([$title, $catId, $excerpt, $featuredImage ?: null, $content, $status, $publishedAt, $id]);
             } else {
+                $publishedAt = $status === 'published' ? date('Y-m-d H:i:s') : null;
                 $slug = uniqueSlug($pdo, 'articles', slugify($title));
                 $stmt = $pdo->prepare(
-                    "INSERT INTO articles (category_id, title, slug, excerpt, featured_image, content, status, published_at)
-                     VALUES (?, ?, ?, ?, ?, ?, ?, IF(? = 'published', NOW(), NULL))"
+                    'INSERT INTO articles (category_id, title, slug, excerpt, featured_image, content, status, published_at)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
                 );
-                $stmt->execute([$catId, $title, $slug, $excerpt, $featuredImage ?: null, $content, $status, $status]);
+                $stmt->execute([$catId, $title, $slug, $excerpt, $featuredImage ?: null, $content, $status, $publishedAt]);
                 $id = (int)$pdo->lastInsertId();
             }
             redirect('/admin/articles.php?saved=1&edit=' . $id);
