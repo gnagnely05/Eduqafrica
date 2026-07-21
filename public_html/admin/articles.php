@@ -3,75 +3,86 @@ require_once __DIR__ . '/../../includes/admin-layout.php';
 
 $pdo = db();
 $saved = false;
+$fatalError = null;
 
-// ---- Suppression ----
-if (($_GET['action'] ?? '') === 'delete' && csrfCheck($_GET['csrf'] ?? null)) {
-    $stmt = $pdo->prepare('DELETE FROM articles WHERE id = ?');
-    $stmt->execute([(int)$_GET['id']]);
-    redirect('/admin/articles.php');
-}
+try {
+    // ---- Suppression ----
+    if (($_GET['action'] ?? '') === 'delete' && csrfCheck($_GET['csrf'] ?? null)) {
+        $stmt = $pdo->prepare('DELETE FROM articles WHERE id = ?');
+        $stmt->execute([(int)$_GET['id']]);
+        redirect('/admin/articles.php');
+    }
 
-// ---- Sauvegarde (création ou édition) ----
-$uploadError = null;
+    // ---- Sauvegarde (création ou édition) ----
+    $uploadError = null;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrfCheck($_POST['csrf'] ?? null)) {
-    $id       = (int)($_POST['id'] ?? 0);
-    $title    = trim($_POST['title'] ?? '');
-    $catId    = (int)($_POST['category_id'] ?? 0) ?: null;
-    $excerpt  = trim($_POST['excerpt'] ?? '');
-    $content  = $_POST['content'] ?? '';
-    $status   = ($_POST['status'] ?? 'draft') === 'published' ? 'published' : 'draft';
-    $featuredImage = trim($_POST['featured_image'] ?? '');
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrfCheck($_POST['csrf'] ?? null)) {
+        $id       = (int)($_POST['id'] ?? 0);
+        $title    = trim($_POST['title'] ?? '');
+        $catId    = (int)($_POST['category_id'] ?? 0) ?: null;
+        $excerpt  = trim($_POST['excerpt'] ?? '');
+        $content  = $_POST['content'] ?? '';
+        $status   = ($_POST['status'] ?? 'draft') === 'published' ? 'published' : 'draft';
+        $featuredImage = trim($_POST['featured_image'] ?? '');
 
-    if (!empty($_FILES['featured_image_file']) && $_FILES['featured_image_file']['error'] !== UPLOAD_ERR_NO_FILE) {
-        $res = saveUploadedImage($_FILES['featured_image_file']);
-        if ($res['ok']) {
-            $featuredImage = $res['url'];
-        } else {
-            $uploadError = $res['error'];
+        if (!empty($_FILES['featured_image_file']) && $_FILES['featured_image_file']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $res = saveUploadedImage($_FILES['featured_image_file']);
+            if ($res['ok']) {
+                $featuredImage = $res['url'];
+            } else {
+                $uploadError = $res['error'];
+            }
+        }
+
+        if ($title !== '' && $content !== '') {
+            if ($id) {
+                $stmt = $pdo->prepare(
+                    "UPDATE articles SET title=?, category_id=?, excerpt=?, featured_image=?, content=?, status=?,
+                     published_at = IF(? = 'published' AND published_at IS NULL, NOW(), published_at)
+                     WHERE id=?"
+                );
+                $stmt->execute([$title, $catId, $excerpt, $featuredImage ?: null, $content, $status, $status, $id]);
+            } else {
+                $slug = uniqueSlug($pdo, 'articles', slugify($title));
+                $stmt = $pdo->prepare(
+                    "INSERT INTO articles (category_id, title, slug, excerpt, featured_image, content, status, published_at)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, IF(? = 'published', NOW(), NULL))"
+                );
+                $stmt->execute([$catId, $title, $slug, $excerpt, $featuredImage ?: null, $content, $status, $status]);
+                $id = (int)$pdo->lastInsertId();
+            }
+            redirect('/admin/articles.php?saved=1&edit=' . $id);
         }
     }
 
-    if ($title !== '' && $content !== '') {
-        if ($id) {
-            $stmt = $pdo->prepare(
-                "UPDATE articles SET title=?, category_id=?, excerpt=?, featured_image=?, content=?, status=?,
-                 published_at = IF(? = 'published' AND published_at IS NULL, NOW(), published_at)
-                 WHERE id=?"
-            );
-            $stmt->execute([$title, $catId, $excerpt, $featuredImage ?: null, $content, $status, $status, $id]);
-        } else {
-            $slug = uniqueSlug($pdo, 'articles', slugify($title));
-            $stmt = $pdo->prepare(
-                "INSERT INTO articles (category_id, title, slug, excerpt, featured_image, content, status, published_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, IF(? = 'published', NOW(), NULL))"
-            );
-            $stmt->execute([$catId, $title, $slug, $excerpt, $featuredImage ?: null, $content, $status, $status]);
-            $id = (int)$pdo->lastInsertId();
-        }
-        redirect('/admin/articles.php?saved=1&edit=' . $id);
+    $saved = isset($_GET['saved']);
+    $editId = (int)($_GET['edit'] ?? 0);
+    $editing = null;
+    if ($editId) {
+        $stmt = $pdo->prepare('SELECT * FROM articles WHERE id = ?');
+        $stmt->execute([$editId]);
+        $editing = $stmt->fetch();
     }
-}
+    $showForm = $editing || isset($_GET['new']);
 
-$saved = isset($_GET['saved']);
-$editId = (int)($_GET['edit'] ?? 0);
-$editing = null;
-if ($editId) {
-    $stmt = $pdo->prepare('SELECT * FROM articles WHERE id = ?');
-    $stmt->execute([$editId]);
-    $editing = $stmt->fetch();
+    $mediaImages = listUploadedImages();
+    $cats = $pdo->query('SELECT id, name FROM categories ORDER BY name')->fetchAll();
+    $articles = $pdo->query(
+        "SELECT a.id, a.title, a.slug, a.status, a.views, a.published_at, c.name AS cat
+         FROM articles a LEFT JOIN categories c ON c.id = a.category_id
+         ORDER BY a.id DESC"
+    )->fetchAll();
+} catch (Throwable $e) {
+    $fatalError = $e->getMessage();
 }
-$showForm = $editing || isset($_GET['new']);
-
-$mediaImages = listUploadedImages();
-$cats = $pdo->query('SELECT id, name FROM categories ORDER BY name')->fetchAll();
-$articles = $pdo->query(
-    "SELECT a.id, a.title, a.slug, a.status, a.views, a.published_at, c.name AS cat
-     FROM articles a LEFT JOIN categories c ON c.id = a.category_id
-     ORDER BY a.id DESC"
-)->fetchAll();
 
 adminHeader('Articles du blog');
+
+if ($fatalError) {
+    echo '<div class="panel" style="border-color:#8C2F1B;"><h2>❌ Erreur</h2><p>' . e($fatalError) . '</p></div>';
+    adminFooter();
+    exit;
+}
 ?>
 
 <?php if ($saved): ?><div class="alert-success">✅ Article enregistré.</div><?php endif; ?>
