@@ -56,11 +56,16 @@ try {
                 $stmt->execute([$catId, $title, $slug, $excerpt, $featuredImage ?: null, $content, $status, $publishedAt]);
                 $id = (int)$pdo->lastInsertId();
             }
-            redirect('/admin/articles.php?saved=1&edit=' . $id);
+            $redirectUrl = '/admin/articles.php?saved=1&edit=' . $id;
+            if ($uploadError) {
+                $redirectUrl .= '&imgerr=' . urlencode($uploadError);
+            }
+            redirect($redirectUrl);
         }
     }
 
     $saved = isset($_GET['saved']);
+    $uploadError = $uploadError ?: ($_GET['imgerr'] ?? null);
     $editId = (int)($_GET['edit'] ?? 0);
     $editing = null;
     if ($editId) {
