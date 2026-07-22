@@ -16,6 +16,8 @@ function adminHeader(string $title): void
         'media.php'    => '🖼️ Médiathèque',
         'design.php'   => '🎨 Couleurs & polices',
         'articles.php' => '📝 Articles',
+        'jobs.php'     => '💼 Emplois',
+        'bourses.php'  => '🎓 Bourses',
         'settings.php' => '⚙️ Tarifs & codes',
         'messages.php' => '✉️ Messages',
     ];

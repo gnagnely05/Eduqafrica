@@ -51,6 +51,13 @@ $purposeLabels = [
 adminHeader('Tableau de bord');
 ?>
 
+<p style="margin-bottom:20px; display:flex; gap:8px; flex-wrap:wrap;">
+  <a href="/admin/run-fetch.php?type=jobs&csrf=<?= e(csrfToken()) ?>" class="btn btn-primary"
+     onclick="return confirm('Lancer la recherche IA d\'emplois sur le web ? Cela peut prendre jusqu\'à une minute.')">🔍 Rechercher des emplois (IA)</a>
+  <a href="/admin/run-fetch.php?type=scholarships&csrf=<?= e(csrfToken()) ?>" class="btn btn-primary"
+     onclick="return confirm('Lancer la recherche IA de bourses sur le web ? Cela peut prendre jusqu\'à une minute.')">🔍 Rechercher des bourses (IA)</a>
+</p>
+
 <div class="kpi-grid">
   <div class="kpi"><div class="val"><?= xof($revTotal) ?></div><div class="lbl">Revenus totaux</div>
     <div class="sub">+<?= xof($revMonth) ?> ce mois</div></div>

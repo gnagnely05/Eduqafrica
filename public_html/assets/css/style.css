@@ -198,6 +198,8 @@ textarea.form-control { resize: vertical; min-height: 120px; }
 .article-body .ql-size-huge { font-size: 2.5em; }
 .article-body .ql-indent-1 { padding-left: 3em; }
 .article-body .ql-indent-2 { padding-left: 6em; }
+.article-body div a { color: var(--coral-text); text-decoration: underline; font-weight: 600; }
+.article-body div a:hover { color: var(--coral); }
 .form-narrow { max-width: 480px; margin: 60px auto; padding: 0 20px; }
 .btn-coral { background: var(--coral); color: #fff; }
 .btn-amber { background: var(--coral); color: var(--near-black); }
