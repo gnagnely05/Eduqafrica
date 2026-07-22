@@ -191,6 +191,23 @@ CREATE TABLE IF NOT EXISTS single_unlocks (
   FOREIGN KEY (payment_id) REFERENCES payment_transactions(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ---------- Test de personnalité RIASEC ----------
+CREATE TABLE IF NOT EXISTS personality_tests (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id INT UNSIGNED NULL,
+  session_id VARCHAR(128) NOT NULL,
+  score_r INT UNSIGNED NOT NULL DEFAULT 0,
+  score_i INT UNSIGNED NOT NULL DEFAULT 0,
+  score_a INT UNSIGNED NOT NULL DEFAULT 0,
+  score_s INT UNSIGNED NOT NULL DEFAULT 0,
+  score_e INT UNSIGNED NOT NULL DEFAULT 0,
+  score_c INT UNSIGNED NOT NULL DEFAULT 0,
+  code VARCHAR(6) NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_user (user_id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Catégories de blog de départ
 INSERT INTO categories (name, slug) VALUES
 ('Orientation', 'orientation'),

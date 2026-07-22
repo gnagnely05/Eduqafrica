@@ -14,6 +14,7 @@ require_once __DIR__ . '/../config/config.php';
       <div class="footer-heading">Outils</div>
       <a href="/">Accueil</a>
       <a href="/chat.php">Orientation IA</a>
+      <a href="/personnalite.php">Test de personnalité</a>
       <a href="/cv-assistant.php">Générateur de CV</a>
       <a href="/bourses.php">Bourses</a>
       <a href="/emplois.php">Emplois</a>

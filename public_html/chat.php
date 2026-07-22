@@ -16,6 +16,7 @@ $hasChatPremium = $user ? hasActiveSubscription((int)$user['id'], 'chat') : fals
       Ton rapport d'orientation complet (profil RIASEC, métiers compatibles, plan d'action) : <?= price('chat_single') ?> F la question ou <?= price('chat_monthly') ?> F/mois.
     <?php endif; ?>
   </p>
+  <p style="margin-top:10px;">💡 Envie d'un premier aperçu ? <a href="/personnalite.php">Fais le test de personnalité RIASEC</a> (gratuit, 2 minutes) avant de discuter.</p>
 
   <div class="chat-messages" id="chatMessages">
     <div class="msg msg-ai">Salut ! 👋 Je suis ton conseiller d'orientation. Dis-moi où tu en es (ton niveau, ton pays) et ce que tu cherches, je t'aide à y voir clair.</div>
