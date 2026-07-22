@@ -31,7 +31,8 @@ $fontsParam  = implode('&family=', array_map(
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=<?= e($fontsParam) ?>&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/style.css">
+<?php $styleVersion = @filemtime(__DIR__ . '/../public_html/assets/css/style.css') ?: time(); ?>
+<link rel="stylesheet" href="/assets/css/style.css?v=<?= $styleVersion ?>">
 <style>
 :root {
   --dark-teal: <?= e(setting('color_dark_teal', '#0B2524')) ?>;

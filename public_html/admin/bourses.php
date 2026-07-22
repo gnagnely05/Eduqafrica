@@ -13,6 +13,13 @@ try {
         redirect('/admin/bourses.php');
     }
 
+    // ---- Bascule Premium ----
+    if (($_GET['action'] ?? '') === 'toggle-premium' && csrfCheck($_GET['csrf'] ?? null)) {
+        $stmt = $pdo->prepare('UPDATE scholarships SET is_premium = NOT is_premium WHERE id = ?');
+        $stmt->execute([(int)$_GET['id']]);
+        redirect('/admin/bourses.php');
+    }
+
     // ---- Sauvegarde (création ou édition) ----
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrfCheck($_POST['csrf'] ?? null)) {
         $id                 = (int)($_POST['id'] ?? 0);
@@ -163,6 +170,8 @@ if ($fatalError) {
       <td><?= $b['deadline'] ? e(date('d/m/Y', strtotime($b['deadline']))) : '—' ?></td>
       <td style="white-space:nowrap;">
         <a href="?edit=<?= (int)$b['id'] ?>" class="btn btn-sm btn-primary">Modifier</a>
+        <a href="?action=toggle-premium&id=<?= (int)$b['id'] ?>&csrf=<?= e(csrfToken()) ?>"
+           class="btn btn-sm <?= $b['is_premium'] ? 'btn-danger' : 'btn-amber' ?>"><?= $b['is_premium'] ? 'Retirer Premium' : 'Passer Premium' ?></a>
         <a href="?action=delete&id=<?= (int)$b['id'] ?>&csrf=<?= e(csrfToken()) ?>"
            onclick="return confirm('Supprimer définitivement cette bourse ?')"
            class="btn btn-sm btn-danger">Suppr.</a>
