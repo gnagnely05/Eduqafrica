@@ -9,11 +9,11 @@ $hasChatPremium = $user ? hasActiveSubscription((int)$user['id'], 'chat') : fals
   <span class="eyebrow">Orientation IA</span>
   <h1>Quelle est ta question&nbsp;?</h1>
   <p style="color:var(--ink-soft); margin-top:8px;">
-    Filières, concours, écoles, réorientation, débouchés… Réponse rapide gratuite.
+    Filières, concours, écoles, réorientation, débouchés… Discute librement, gratuitement.
     <?php if ($hasChatPremium): ?>
-      <span class="badge badge-premium">Abonnement actif — réponses approfondies</span>
+      <span class="badge badge-premium">Abonnement actif — rapport d'orientation complet</span>
     <?php else: ?>
-      Pour une analyse approfondie : <?= price('chat_single') ?> F la question ou <?= price('chat_monthly') ?> F/mois.
+      Ton rapport d'orientation complet (profil RIASEC, métiers compatibles, plan d'action) : <?= price('chat_single') ?> F la question ou <?= price('chat_monthly') ?> F/mois.
     <?php endif; ?>
   </p>
 
@@ -38,25 +38,67 @@ const input = document.getElementById('chatInput');
 const sendBtn = document.getElementById('chatSend');
 let conversationId = null;
 
+function formatMsg(text) {
+  return text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
 function addMsg(text, cls) {
   const div = document.createElement('div');
   div.className = 'msg ' + cls;
-  div.textContent = text;
+  div.innerHTML = formatMsg(text);
   messagesEl.appendChild(div);
   div.scrollIntoView({ behavior: 'smooth', block: 'end' });
   return div;
+}
+
+function sendMessage(text) {
+  document.querySelectorAll('.quick-replies').forEach(el => el.remove());
+  input.value = text;
+  if (form.requestSubmit) {
+    form.requestSubmit();
+  } else {
+    form.dispatchEvent(new Event('submit', { cancelable: true }));
+  }
+}
+
+function addOptions(options) {
+  const wrap = document.createElement('div');
+  wrap.className = 'quick-replies';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'quick-reply';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => sendMessage(opt));
+    wrap.appendChild(btn);
+  });
+  messagesEl.appendChild(wrap);
+  wrap.scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
+
+function addTeaser(teaser) {
+  const div = document.createElement('div');
+  div.className = 'msg msg-ai';
+  div.style.filter = 'blur(4px)';
+  div.style.userSelect = 'none';
+  div.textContent = teaser;
+  messagesEl.appendChild(div);
 }
 
 function addPaywall(messageId) {
   const box = document.createElement('div');
   box.className = 'paywall-box';
   box.innerHTML = `
-    <p><strong>🔓 Tu veux aller plus loin ?</strong> Débloquer l'analyse approfondie : plan d'action détaillé, écoles précises, coûts, alternatives.</p>
+    <p><strong>🔓 Ton profil se précise !</strong> Débloque ton rapport d'orientation complet : profil RIASEC, 10 métiers compatibles avec score, plan d'action 30/90/365 jours, SWOT personnelle — et en abonnement, accès à un test de personnalité approfondi.</p>
     <div class="paywall-actions">
       <a href="/payer.php?type=chat_single&mid=${messageId}" class="btn btn-coral">Cette question — ${PRICE_SINGLE} F</a>
       <a href="/payer.php?type=chat_monthly" class="btn btn-amber">Abonnement 1 mois — ${PRICE_MONTHLY} F</a>
     </div>`;
   messagesEl.appendChild(box);
+  box.scrollIntoView({ behavior: 'smooth', block: 'end' });
 }
 
 form.addEventListener('submit', async (e) => {
@@ -83,13 +125,19 @@ form.addEventListener('submit', async (e) => {
     } else {
       conversationId = data.conversation_id;
       addMsg(data.reply, 'msg-ai' + (data.is_limited ? ' locked' : ''));
+
+      if (data.teaser) addTeaser(data.teaser);
+
       if (data.is_limited && IS_LOGGED_IN) {
         addPaywall(data.message_id);
       } else if (data.is_limited && !IS_LOGGED_IN) {
         const box = document.createElement('div');
         box.className = 'paywall-box';
-        box.innerHTML = `<p><strong>🔓 Réponse approfondie disponible.</strong> <a href="/register.php?back=/chat.php">Crée un compte gratuit</a> pour débloquer les analyses détaillées (${PRICE_SINGLE} F la question ou ${PRICE_MONTHLY} F/mois).</p>`;
+        box.innerHTML = `<p><strong>🔓 Ton profil se précise !</strong> <a href="/register.php?back=/chat.php">Crée un compte gratuit</a> pour débloquer ton rapport d'orientation complet (${PRICE_SINGLE} F la question ou ${PRICE_MONTHLY} F/mois en abonnement, avec test de personnalité approfondi).</p>`;
         messagesEl.appendChild(box);
+        box.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      } else if (data.options && data.options.length) {
+        addOptions(data.options);
       }
     }
   } catch (err) {

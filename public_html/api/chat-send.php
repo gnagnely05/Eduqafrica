@@ -61,6 +61,15 @@ $stmt = $pdo->prepare(
 $stmt->execute([$conversationId]);
 $history = array_reverse($stmt->fetchAll());
 
+// Nombre d'échanges de l'utilisateur dans cette conversation (message actuel inclus).
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM chat_messages WHERE conversation_id = ? AND role = 'user'");
+$stmt->execute([$conversationId]);
+$userMsgCount = (int)$stmt->fetchColumn();
+
+// Profondeur gratuite avant de proposer le récapitulatif + l'offre premium.
+$freeDepth = 5;
+$reachedFreeLimit = !$isPremium && $userMsgCount >= $freeDepth;
+
 // ---- Prompt système selon le niveau d'accès ----
 $countryHint = $user['country'] ?? null;
 
@@ -74,6 +83,8 @@ PRINCIPES SCIENTIFIQUES (base tes raisonnements sur ces cadres, sans les nommer 
 Un bon conseil croise toujours : intérêts, aptitudes réelles, valeurs, personnalité, contraintes (budget, mobilité, famille), opportunités du marché, perspectives d'évolution des métiers.
 
 MÉTHODE : avant de recommander, cherche à comprendre le profil (âge, pays, niveau d'étude, expériences, langues, compétences, centres d'intérêt), les motivations du changement (salaire, passion, stabilité, entrepreneuriat, équilibre de vie, expatriation...), les contraintes (budget, mobilité, disponibilité, situation familiale), et le potentiel (compétences techniques, soft skills, capacité d'apprentissage). Si une info clé manque, NE SUPPOSE RIEN d'important : pose UNE question à la fois, avec un objectif précis.
+
+L'utilisateur préfère souvent cliquer plutôt que taper. Quand ta question a des réponses courtes et prévisibles (2 à 5 options sensées), termine ton message par une ligne EXACTEMENT au format : <OPTIONS>Option A|Option B|Option C</OPTIONS> (les options doivent être de courtes réponses possibles à ta question, pas des reformulations de la question). N'utilise ce format que pour une question fermée à choix limité ; laisse la question ouverte (sans balise) quand une réponse libre est nécessaire (ex : décrire un projet, donner des notes précises).
 
 Si l'utilisateur vient d'avoir son BAC : ne recommande jamais une filière juste parce qu'elle est populaire — analyse matières préférées, résultats, personnalité, ambitions, puis propose plusieurs filières en expliquant pour chacune pourquoi elle correspond, les métiers possibles, la durée, les compétences requises, les difficultés et débouchés.
 
@@ -105,6 +116,13 @@ Dès que tu as assez d'informations pour donner une recommandation ferme (pas d�
 Sois précis, nuancé. Si le profil manque encore de détails essentiels, privilégie la section "Questions suivantes" plutôt que de deviner.
 PROMPT;
     $maxTokens = 2000;
+} elseif ($reachedFreeLimit) {
+    $systemPrompt = $systemBase . "\n\n" . <<<PROMPT
+MODE RÉCAPITULATIF (visiteur gratuit, échange déjà avancé). Tu as maintenant assez échangé avec cette personne pour esquisser un premier profil. Ne pose PLUS de nouvelle question de clarification. Réponds en deux temps, sans section numérotée :
+1. D'abord, un accusé de réception naturel du dernier message, puis un vrai résumé utile (3-5 phrases) de ce que tu as compris de son profil et des pistes qui se dessinent — reste concret, pas vague.
+2. Termine EXACTEMENT par une ligne au format : <TEASER>une phrase qui donne un avant-goût du rapport complet (mentionne par ex. le profil RIASEC qui se dessine, ou le nombre de métiers compatibles identifiés) SANS révéler les détails précis, formulée pour donner envie d'en savoir plus</TEASER>
+PROMPT;
+    $maxTokens = 500;
 } else {
     $systemPrompt = $systemBase . "\n\n" . <<<PROMPT
 MODE SIMPLE (visiteur gratuit). Réponds en 4-6 phrases maximum. Reste dans l'esprit non-directif et scientifique ci-dessus, mais SANS la structure en 6 sections, SANS tableau comparatif, SANS rapport RIASEC/SWOT complet. Si une information clé manque, pose au maximum UNE question ciblée plutôt que plusieurs. Ne cite pas plus de 2-3 pistes. Ne détaille pas de plan d'action étape par étape. Termine naturellement, sans mentionner qu'une version plus complète existe (l'interface s'en charge). La réponse courte doit malgré tout avoir de la vraie valeur, honnête et utile.
@@ -128,6 +146,20 @@ if (!$result['ok']) {
 
 $reply = $result['content'];
 
+// Options à choix rapide proposées par l'IA (question fermée)
+$options = [];
+if (preg_match('/<OPTIONS>(.*?)<\/OPTIONS>/s', $reply, $m)) {
+    $options = array_values(array_filter(array_map('trim', explode('|', $m[1])), fn($o) => $o !== ''));
+    $reply = trim(str_replace($m[0], '', $reply));
+}
+
+// Avant-goût du rapport premium (mode récapitulatif)
+$teaser = null;
+if (preg_match('/<TEASER>(.*?)<\/TEASER>/s', $reply, $m)) {
+    $teaser = trim($m[1]);
+    $reply = trim(str_replace($m[0], '', $reply));
+}
+
 $stmt = $pdo->prepare('INSERT INTO chat_messages (conversation_id, role, content) VALUES (?, "assistant", ?)');
 $stmt->execute([$conversationId, $reply]);
 $messageId = (int)$pdo->lastInsertId();
@@ -137,5 +169,7 @@ jsonResponse([
     'reply'           => $reply,
     'conversation_id' => $conversationId,
     'message_id'      => $messageId,
-    'is_limited'      => !$isPremium,
+    'is_limited'      => $reachedFreeLimit,
+    'options'         => $options,
+    'teaser'          => $teaser,
 ]);

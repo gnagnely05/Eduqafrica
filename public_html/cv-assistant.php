@@ -61,10 +61,17 @@ const uploadStatus = document.getElementById('uploadStatus');
 
 let history = []; // [{role, content}]
 
+function formatMsg(text) {
+  return text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
 function addMsg(text, cls) {
   const div = document.createElement('div');
   div.className = 'msg ' + cls;
-  div.textContent = text;
+  div.innerHTML = formatMsg(text);
   messagesEl.appendChild(div);
   div.scrollIntoView({ behavior: 'smooth', block: 'end' });
   return div;
