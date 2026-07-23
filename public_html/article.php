@@ -34,6 +34,8 @@ require_once __DIR__ . '/../includes/header.php';
 
     <div><?= $a['content'] /* HTML rédigé via l'admin — auteur de confiance */ ?></div>
 
+    <?= shareButtons($a['title'], SITE_URL . '/article.php?slug=' . $a['slug']) ?>
+
     <div class="card" style="margin-top:36px; background:var(--paper-dim);">
       <p><strong>Besoin d'un conseil personnalisé ?</strong> Pose ta question à notre conseiller d'orientation IA, c'est gratuit.</p>
       <a href="/chat.php" class="btn btn-primary" style="margin-top:10px;">Poser ma question</a>

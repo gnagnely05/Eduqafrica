@@ -33,6 +33,8 @@ require_once __DIR__ . '/../includes/header.php';
     <p class="deadline" style="font-size:1rem; margin-bottom:20px;">📅 Date limite : <?= dateFr($b['deadline']) ?></p>
   <?php endif; ?>
 
+  <?= shareButtons($b['title'], SITE_URL . '/bourse.php?slug=' . $b['slug']) ?>
+
   <?php if ($unlocked): ?>
     <div class="card">
       <p style="white-space:pre-wrap;"><?= e($b['description']) ?></p>

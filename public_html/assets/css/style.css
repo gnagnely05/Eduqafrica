@@ -172,6 +172,16 @@ textarea.form-control { resize: vertical; min-height: 120px; }
 .upload-zone:hover, .upload-zone.dragover { border-color: var(--coral); background: var(--mint); }
 .upload-zone .up-icon { font-size: 2.2rem; margin-bottom: 8px; }
 
+/* ---------- Partage social ---------- */
+.share-buttons { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 24px 0; }
+.share-label { font-size: .85rem; color: var(--text-light); font-weight: 600; margin-right: 2px; }
+.share-btn { display: inline-flex; align-items: center; padding: 8px 16px; border-radius: 999px; font-size: .85rem; font-weight: 600; color: #fff; text-decoration: none; }
+.share-btn:hover { opacity: .85; }
+.share-whatsapp { background: #25D366; }
+.share-facebook { background: #1877F2; }
+.share-x { background: #000; }
+.share-linkedin { background: #0A66C2; }
+
 .badge { display: inline-block; font-size: .74rem; font-weight: 700; padding: 3px 11px; border-radius: 99px; background: var(--light-grey); }
 .badge-premium { background: var(--coral); color: #fff; }
 .card { background: #fff; border: 1px solid rgba(11,37,36,.1); border-radius: var(--radius); padding: 24px; }

@@ -100,6 +100,25 @@ function xof(int $amount): string
     return number_format($amount, 0, ',', ' ') . ' F';
 }
 
+/** Boutons de partage (WhatsApp, Facebook, X, LinkedIn) pour une page donnée. */
+function shareButtons(string $title, string $url): string
+{
+    $encUrl = rawurlencode($url);
+    $encText = rawurlencode($title);
+
+    return '<div class="share-buttons">'
+        . '<span class="share-label">Partager :</span>'
+        . '<a class="share-btn share-whatsapp" target="_blank" rel="noopener" aria-label="Partager sur WhatsApp" '
+        . 'href="https://wa.me/?text=' . $encText . '%20' . $encUrl . '">WhatsApp</a>'
+        . '<a class="share-btn share-facebook" target="_blank" rel="noopener" aria-label="Partager sur Facebook" '
+        . 'href="https://www.facebook.com/sharer/sharer.php?u=' . $encUrl . '">Facebook</a>'
+        . '<a class="share-btn share-x" target="_blank" rel="noopener" aria-label="Partager sur X" '
+        . 'href="https://twitter.com/intent/tweet?text=' . $encText . '&amp;url=' . $encUrl . '">X</a>'
+        . '<a class="share-btn share-linkedin" target="_blank" rel="noopener" aria-label="Partager sur LinkedIn" '
+        . 'href="https://www.linkedin.com/sharing/share-offsite/?url=' . $encUrl . '">LinkedIn</a>'
+        . '</div>';
+}
+
 // ---- Médiathèque (images uploadées depuis l'admin) ----
 
 define('UPLOAD_DIR_PATH', __DIR__ . '/../public_html/assets/uploads');

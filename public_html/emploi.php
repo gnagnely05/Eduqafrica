@@ -34,6 +34,8 @@ require_once __DIR__ . '/../includes/header.php';
     <p class="meta" style="margin-top:10px;">Source : <?= e($j['source_domain'] ?? '') ?> — postule toujours via le site original.</p>
   </div>
 
+  <?= shareButtons($j['title'] . ($j['company'] ? ' — ' . $j['company'] : ''), SITE_URL . '/emploi.php?slug=' . $j['slug']) ?>
+
   <div class="card" style="margin-top:20px; background:var(--paper-dim);">
     <p><strong>💡 Ton CV n'est pas prêt ?</strong> Crée un CV professionnel en 5 minutes avec notre générateur.</p>
     <a href="/cv-generator.php" class="btn btn-amber" style="margin-top:10px;">Créer mon CV</a>
