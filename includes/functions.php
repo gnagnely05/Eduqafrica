@@ -84,12 +84,8 @@ function setting(string $key, ?string $default = null): ?string
 function price(string $name): int
 {
     $fallback = [
-        'cv_download'     => PRICE_CV_DOWNLOAD,
-        'chat_single'     => PRICE_CHAT_SINGLE,
-        'chat_monthly'    => PRICE_CHAT_MONTHLY,
-        'bourses_single'  => PRICE_BOURSES_SINGLE,
-        'bourses_monthly' => PRICE_BOURSES_MONTHLY,
-        'bundle_monthly'  => PRICE_BUNDLE_MONTHLY,
+        'cv_download'                 => PRICE_CV_DOWNLOAD,
+        'orientation_bourses_monthly' => PRICE_ORIENTATION_BOURSES_MONTHLY,
     ];
     return (int) setting('price_' . $name, (string)($fallback[$name] ?? 0));
 }

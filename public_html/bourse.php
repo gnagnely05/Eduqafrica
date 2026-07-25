@@ -51,9 +51,7 @@ require_once __DIR__ . '/../includes/header.php';
       <p><strong>🔒 Bourse Premium.</strong> Débloque la description complète, les critères d'éligibilité et le lien officiel de candidature.</p>
       <div class="paywall-actions">
         <?php if ($user): ?>
-          <a href="/payer.php?type=bourses_single&sid=<?= (int)$b['id'] ?>" class="btn btn-coral">Cette bourse — <?= price('bourses_single') ?> F</a>
-          <a href="/payer.php?type=bourses_monthly" class="btn btn-amber">Toutes les bourses 1 mois — <?= price('bourses_monthly') ?> F</a>
-          <a href="/payer.php?type=bundle" class="btn btn-ghost">Bundle + chat IA — <?= price('bundle_monthly') ?> F/mois</a>
+          <a href="/payer.php?type=orientation_bourses" class="btn btn-amber">Orientation + Bourses — <?= price('orientation_bourses_monthly') ?> F/mois</a>
         <?php else: ?>
           <a href="/register.php?back=<?= urlencode('/bourse.php?slug=' . $b['slug']) ?>" class="btn btn-coral">Créer un compte pour débloquer</a>
         <?php endif; ?>

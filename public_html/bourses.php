@@ -31,7 +31,7 @@ $bourses = $stmt->fetchAll();
   <h1>Bourses ouvertes en ce moment</h1>
   <p style="color:var(--ink-soft); margin:12px 0 8px; max-width:640px;">
     Mises à jour chaque semaine. Les bourses <span class="badge badge-premium">Premium</span> sont les bourses 100% financées et prestigieuses —
-    <?php if ($hasBoursesPremium): ?>ton abonnement est actif ✅<?php else: ?>accès à <?= price('bourses_single') ?> F l'unité ou <?= price('bourses_monthly') ?> F/mois<?php endif; ?>.
+    <?php if ($hasBoursesPremium): ?>ton abonnement est actif ✅<?php else: ?>accès via l'abonnement Orientation + Bourses à <?= price('orientation_bourses_monthly') ?> F/mois<?php endif; ?>.
   </p>
 
   <div style="display:flex; gap:10px; margin:20px 0 28px; flex-wrap:wrap;">
@@ -77,8 +77,7 @@ $bourses = $stmt->fetchAll();
   <div class="paywall-box" style="margin-top:32px; max-width:640px;">
     <p><strong>💎 Accès Premium bourses</strong> — toutes les bourses 100% financées, avec descriptions complètes et liens officiels.</p>
     <div class="paywall-actions">
-      <a href="<?= $user ? '/payer.php?type=bourses_monthly' : '/register.php?back=/bourses.php' ?>" class="btn btn-amber">1 mois — <?= price('bourses_monthly') ?> F</a>
-      <a href="<?= $user ? '/payer.php?type=bundle' : '/register.php?back=/bourses.php' ?>" class="btn btn-coral">Bundle chat + bourses — <?= price('bundle_monthly') ?> F/mois</a>
+      <a href="<?= $user ? '/payer.php?type=orientation_bourses' : '/register.php?back=/bourses.php' ?>" class="btn btn-coral">Orientation + Bourses — <?= price('orientation_bourses_monthly') ?> F/mois</a>
     </div>
   </div>
   <?php endif; ?>

@@ -5,12 +5,8 @@ $pdo = db();
 $saved = false;
 
 $priceKeys = [
-    'price_cv_download'     => 'Téléchargement CV (PDF)',
-    'price_chat_single'     => 'Chat — question à l\'unité',
-    'price_chat_monthly'    => 'Chat — abonnement mensuel',
-    'price_bourses_single'  => 'Bourse — accès à l\'unité',
-    'price_bourses_monthly' => 'Bourses — abonnement mensuel',
-    'price_bundle_monthly'  => 'Bundle chat + bourses — mensuel',
+    'price_cv_download'                 => 'Téléchargement CV (PDF)',
+    'price_orientation_bourses_monthly' => 'Orientation + Bourses — abonnement mensuel',
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrfCheck($_POST['csrf'] ?? null)) {

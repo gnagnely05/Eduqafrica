@@ -34,17 +34,20 @@ define('OPENROUTER_MODEL_CHAT', 'anthropic/claude-haiku-4.5');
 define('OPENROUTER_MODEL_SEARCH', 'perplexity/sonar');
 // Astuce : suffixe ":online" pour activer la recherche web sur n'importe quel modèle.
 
-// ---- Moneroo ----
+// ---- Moneroo (ancien prestataire — conservé pour l'historique des paiements) ----
 define('MONEROO_SECRET_KEY', 'CHANGE_ME');
 define('MONEROO_API_URL', 'https://api.moneroo.io/v1');
 
+// ---- Chariow (prestataire de paiement actif) ----
+define('CHARIOW_API_KEY', 'CHANGE_ME');           // app.chariow.com > Réglages > Clés API
+define('CHARIOW_API_URL', 'https://api.chariow.com/v1');
+define('CHARIOW_STORE_DOMAIN', 'pdcnmorg.mychariow.online');
+define('CHARIOW_PRODUCT_CV', 'prd_xyzhbmkh');            // Widget CV — 1500 F
+define('CHARIOW_PRODUCT_ORIENTATION', 'prd_n8w7zdma');   // Widget Orientation + Bourses — 1000 F/mois
+
 // ---- Tarifs (XOF) ----
 define('PRICE_CV_DOWNLOAD', 1500);
-define('PRICE_CHAT_SINGLE', 500);
-define('PRICE_CHAT_MONTHLY', 500);
-define('PRICE_BOURSES_SINGLE', 500);
-define('PRICE_BOURSES_MONTHLY', 500);
-define('PRICE_BUNDLE_MONTHLY', 1000);
+define('PRICE_ORIENTATION_BOURSES_MONTHLY', 1000);
 
 // ---- Divers ----
 define('SUBSCRIPTION_DAYS', 30);

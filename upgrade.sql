@@ -76,3 +76,17 @@ CREATE TABLE IF NOT EXISTS personality_tests (
   INDEX idx_user (user_id),
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------- v8 : migration paiements vers Chariow ----------
+-- Nouveau modèle : CV (1500F, inchangé) + un seul abonnement Orientation+Bourses (1000F/mois).
+-- Les anciens types (chat_single, chat_monthly, bourses_single, bourses_monthly, bundle_monthly)
+-- restent dans l'ENUM pour ne pas casser l'historique des transactions déjà enregistrées, mais
+-- ne sont plus proposés à l'achat.
+ALTER TABLE payment_transactions MODIFY purpose ENUM(
+  'cv_download','chat_single_unlock','chat_subscription_monthly',
+  'bourses_single_unlock','bourses_subscription_monthly',
+  'bundle_subscription_monthly','orientation_bourses_monthly'
+) NOT NULL;
+ALTER TABLE payment_transactions MODIFY user_id INT UNSIGNED NULL;
+ALTER TABLE payment_transactions ADD COLUMN provider VARCHAR(20) NOT NULL DEFAULT 'moneroo' AFTER currency;
+ALTER TABLE payment_transactions ADD COLUMN chariow_sale_id VARCHAR(60) NULL UNIQUE AFTER moneroo_reference;

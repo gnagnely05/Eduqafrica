@@ -19,7 +19,7 @@ $cvs = db()->prepare(
 $cvs->execute([$uid]);
 $cvs = $cvs->fetchAll();
 
-$planLabels = ['chat' => 'Orientation IA', 'bourses' => 'Bourses premium', 'bundle' => 'Bundle chat + bourses'];
+$planLabels = ['chat' => 'Orientation IA', 'bourses' => 'Bourses premium', 'bundle' => 'Orientation + Bourses'];
 
 $pageTitle = "Mon compte";
 require_once __DIR__ . '/../includes/header.php';
@@ -32,9 +32,7 @@ require_once __DIR__ . '/../includes/header.php';
   <?php if (!$subs): ?>
     <div class="card"><p>Aucun abonnement pour le moment.</p>
     <div class="paywall-actions" style="margin-top:12px;">
-      <a href="/payer.php?type=chat_monthly" class="btn btn-ghost">Orientation IA — <?= price('chat_monthly') ?> F/mois</a>
-      <a href="/payer.php?type=bourses_monthly" class="btn btn-ghost">Bourses — <?= price('bourses_monthly') ?> F/mois</a>
-      <a href="/payer.php?type=bundle" class="btn btn-amber">Bundle — <?= price('bundle_monthly') ?> F/mois</a>
+      <a href="/payer.php?type=orientation_bourses" class="btn btn-amber">Orientation + Bourses — <?= price('orientation_bourses_monthly') ?> F/mois</a>
     </div></div>
   <?php else: ?>
     <div class="listing">

@@ -144,8 +144,7 @@ $careers = riasecCareers();
   <div class="paywall-box" style="margin-top:8px;">
     <p><strong>🔓 Débloque ton analyse complète</strong> — les 3 profils dominants détaillés, la liste complète des métiers correspondants, et intègre ce profil dans une conversation avec notre conseiller IA pour une orientation vraiment personnalisée.</p>
     <div class="paywall-actions">
-      <a href="/payer.php?type=chat_monthly" class="btn btn-amber">Abonnement 1 mois — <?= price('chat_monthly') ?> F</a>
-      <a href="/payer.php?type=bundle" class="btn btn-coral">Bundle + bourses — <?= price('bundle_monthly') ?> F/mois</a>
+      <a href="/payer.php?type=orientation_bourses" class="btn btn-coral">Orientation + Bourses — <?= price('orientation_bourses_monthly') ?> F/mois</a>
     </div>
   </div>
   <?php endif; ?>

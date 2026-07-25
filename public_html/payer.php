@@ -1,12 +1,11 @@
 <?php
 /**
- * Point d'entrée unique des paiements.
- * /payer.php?type=cv&cvid=12 | chat_single&mid=345 | chat_monthly
- * bourses_single&sid=67 | bourses_monthly | bundle
+ * Point d'entrée des paiements — Chariow.
+ * /payer.php?type=cv&cvid=12 | orientation_bourses
  */
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../includes/moneroo.php';
+require_once __DIR__ . '/../includes/chariow.php';
 
 requireLogin();
 $userId = (int)currentUser()['id'];
@@ -20,35 +19,21 @@ switch ($type) {
         $cv = $stmt->fetch();
         if (!$cv) { http_response_code(404); exit('CV introuvable.'); }
         if ($cv['is_paid']) { redirect('/cv-preview.php?id=' . $cvId); }
-        $init = monerooInitPayment($userId, price('cv_download'), 'cv_download',
-            'Téléchargement CV PDF — ' . SITE_NAME, $cvId);
+        chariowCreatePendingTx($userId, price('cv_download'), 'cv_download', $cvId);
+        $productId = CHARIOW_PRODUCT_CV;
+        $label = 'Téléchargement CV PDF';
+        $amount = price('cv_download');
+        $backUrl = '/cv-preview.php?id=' . $cvId;
+        $backLabel = 'Retourner à mon CV';
         break;
 
-    case 'chat_single':
-        $mid = (int)($_GET['mid'] ?? 0) ?: null;
-        $init = monerooInitPayment($userId, price('chat_single'), 'chat_single_unlock',
-            'Réponse approfondie orientation — ' . SITE_NAME, $mid);
-        break;
-
-    case 'chat_monthly':
-        $init = monerooInitPayment($userId, price('chat_monthly'), 'chat_subscription_monthly',
-            'Abonnement orientation IA 1 mois — ' . SITE_NAME);
-        break;
-
-    case 'bourses_single':
-        $sid = (int)($_GET['sid'] ?? 0) ?: null;
-        $init = monerooInitPayment($userId, price('bourses_single'), 'bourses_single_unlock',
-            'Accès bourse premium — ' . SITE_NAME, $sid);
-        break;
-
-    case 'bourses_monthly':
-        $init = monerooInitPayment($userId, price('bourses_monthly'), 'bourses_subscription_monthly',
-            'Abonnement bourses premium 1 mois — ' . SITE_NAME);
-        break;
-
-    case 'bundle':
-        $init = monerooInitPayment($userId, price('bundle_monthly'), 'bundle_subscription_monthly',
-            'Abonnement complet (orientation + bourses) 1 mois — ' . SITE_NAME);
+    case 'orientation_bourses':
+        chariowCreatePendingTx($userId, price('orientation_bourses_monthly'), 'orientation_bourses_monthly');
+        $productId = CHARIOW_PRODUCT_ORIENTATION;
+        $label = 'Abonnement Orientation + Bourses (1 mois)';
+        $amount = price('orientation_bourses_monthly');
+        $backUrl = '/chat.php';
+        $backLabel = 'Retourner au chat';
         break;
 
     default:
@@ -56,16 +41,20 @@ switch ($type) {
         exit('Type de paiement inconnu.');
 }
 
-if (!$init['ok']) {
-    $pageTitle = 'Paiement indisponible';
-    require_once __DIR__ . '/../includes/header.php';
-    echo '<div class="container section"><div class="alert alert-error">Le paiement est momentanément indisponible. Réessaie dans quelques minutes ou <a href="/contact.php">contacte-nous</a>.</div>';
-    if (ENV === 'development') {
-        echo '<pre style="background:#fee; padding:12px; border-radius:6px; margin-top:12px; overflow:auto;">Détails technique (dev) : ' . e($init['error']) . '</pre>';
-    }
-    echo '</div>';
-    require_once __DIR__ . '/../includes/footer.php';
-    exit;
-}
+$pageTitle = 'Paiement';
+require_once __DIR__ . '/../includes/header.php';
+?>
+<div class="container section" style="max-width:520px; text-align:center;">
+  <h1 style="margin-bottom:6px;"><?= e($label) ?></h1>
+  <p class="meta" style="margin-bottom:28px;"><?= xof($amount) ?></p>
 
-redirect($init['checkout_url']);
+  <div class="card" style="padding:32px; display:flex; justify-content:center;">
+    <?= chariowWidgetHtml($productId) ?>
+  </div>
+
+  <p style="margin-top:24px; color:var(--ink-soft); font-size:.92rem;">
+    Après le paiement, ton accès s'active automatiquement en quelques secondes.
+  </p>
+  <a href="<?= e($backUrl) ?>" class="btn btn-ghost" style="margin-top:12px;"><?= e($backLabel) ?></a>
+</div>
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>

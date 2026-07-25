@@ -28,8 +28,8 @@ $revByPurpose = $pdo->query(
 
 // Derniers paiements
 $lastPayments = $pdo->query(
-    "SELECT p.id, p.amount, p.purpose, p.status, p.created_at, u.name, u.email
-     FROM payment_transactions p JOIN users u ON u.id = p.user_id
+    "SELECT p.id, p.amount, p.purpose, p.status, p.provider, p.created_at, u.name, u.email
+     FROM payment_transactions p LEFT JOIN users u ON u.id = p.user_id
      ORDER BY p.id DESC LIMIT 10"
 )->fetchAll();
 
@@ -41,6 +41,8 @@ $cronLogs = $pdo->query(
 
 $purposeLabels = [
     'cv_download' => 'CV PDF',
+    'orientation_bourses_monthly' => 'Orientation + Bourses',
+    // Anciens types (historique, plus proposés à l'achat) :
     'chat_single_unlock' => 'Chat (unité)',
     'chat_subscription_monthly' => 'Chat (mois)',
     'bourses_single_unlock' => 'Bourse (unité)',
@@ -117,8 +119,8 @@ adminHeader('Tableau de bord');
     <?php foreach ($lastPayments as $p): ?>
     <tr>
       <td><?= (int)$p['id'] ?></td>
-      <td><?= e($p['name']) ?><br><small><?= e($p['email']) ?></small></td>
-      <td><?= e($purposeLabels[$p['purpose']] ?? $p['purpose']) ?></td>
+      <td><?= e($p['name'] ?? $p['email'] ?? '—') ?><?php if ($p['name'] && $p['email']): ?><br><small><?= e($p['email']) ?></small><?php endif; ?></td>
+      <td><?= e($purposeLabels[$p['purpose']] ?? $p['purpose']) ?> <small class="meta">(<?= e($p['provider'] ?? 'moneroo') ?>)</small></td>
       <td><?= xof((int)$p['amount']) ?></td>
       <td><span class="badge <?= $p['status'] === 'success' ? 'badge-ok' : ($p['status'] === 'pending' ? 'badge-warn' : 'badge-err') ?>"><?= e($p['status']) ?></span></td>
       <td><?= e(date('d/m H:i', strtotime($p['created_at']))) ?></td>

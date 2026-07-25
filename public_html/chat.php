@@ -13,7 +13,7 @@ $hasChatPremium = $user ? hasActiveSubscription((int)$user['id'], 'chat') : fals
     <?php if ($hasChatPremium): ?>
       <span class="badge badge-premium">Abonnement actif — rapport d'orientation complet</span>
     <?php else: ?>
-      Ton rapport d'orientation complet (profil RIASEC, métiers compatibles, plan d'action) : <?= price('chat_single') ?> F la question ou <?= price('chat_monthly') ?> F/mois.
+      Ton rapport d'orientation complet (profil RIASEC, métiers compatibles, plan d'action) : abonnement à <?= price('orientation_bourses_monthly') ?> F/mois (accès aussi aux bourses premium).
     <?php endif; ?>
   </p>
   <p style="margin-top:10px;">💡 Envie d'un premier aperçu ? <a href="/personnalite.php">Fais le test de personnalité RIASEC</a> (gratuit, 2 minutes) avant de discuter.</p>
@@ -30,8 +30,7 @@ $hasChatPremium = $user ? hasActiveSubscription((int)$user['id'], 'chat') : fals
 
 <script>
 const IS_LOGGED_IN = <?= isLoggedIn() ? 'true' : 'false' ?>;
-const PRICE_SINGLE = <?= price('chat_single') ?>;
-const PRICE_MONTHLY = <?= price('chat_monthly') ?>;
+const PRICE_MONTHLY = <?= price('orientation_bourses_monthly') ?>;
 
 const messagesEl = document.getElementById('chatMessages');
 const form = document.getElementById('chatForm');
@@ -93,10 +92,9 @@ function addPaywall(messageId) {
   const box = document.createElement('div');
   box.className = 'paywall-box';
   box.innerHTML = `
-    <p><strong>🔓 Ton profil se précise !</strong> Débloque ton rapport d'orientation complet : profil RIASEC, 10 métiers compatibles avec score, plan d'action 30/90/365 jours, SWOT personnelle — et en abonnement, accès à un test de personnalité approfondi.</p>
+    <p><strong>🔓 Ton profil se précise !</strong> Débloque ton rapport d'orientation complet : profil RIASEC, 10 métiers compatibles avec score, plan d'action 30/90/365 jours, SWOT personnelle — et accès à un test de personnalité approfondi et aux bourses premium.</p>
     <div class="paywall-actions">
-      <a href="/payer.php?type=chat_single&mid=${messageId}" class="btn btn-coral">Cette question — ${PRICE_SINGLE} F</a>
-      <a href="/payer.php?type=chat_monthly" class="btn btn-amber">Abonnement 1 mois — ${PRICE_MONTHLY} F</a>
+      <a href="/payer.php?type=orientation_bourses" class="btn btn-amber">Abonnement Orientation + Bourses — ${PRICE_MONTHLY} F/mois</a>
     </div>`;
   messagesEl.appendChild(box);
   box.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -134,7 +132,7 @@ form.addEventListener('submit', async (e) => {
       } else if (data.is_limited && !IS_LOGGED_IN) {
         const box = document.createElement('div');
         box.className = 'paywall-box';
-        box.innerHTML = `<p><strong>🔓 Ton profil se précise !</strong> <a href="/register.php?back=/chat.php">Crée un compte gratuit</a> pour débloquer ton rapport d'orientation complet (${PRICE_SINGLE} F la question ou ${PRICE_MONTHLY} F/mois en abonnement, avec test de personnalité approfondi).</p>`;
+        box.innerHTML = `<p><strong>🔓 Ton profil se précise !</strong> <a href="/register.php?back=/chat.php">Crée un compte gratuit</a> pour débloquer ton rapport d'orientation complet (${PRICE_MONTHLY} F/mois en abonnement, avec test de personnalité approfondi et bourses premium).</p>`;
         messagesEl.appendChild(box);
         box.scrollIntoView({ behavior: 'smooth', block: 'end' });
       } else if (data.options && data.options.length) {
