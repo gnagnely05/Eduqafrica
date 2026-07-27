@@ -48,52 +48,68 @@ require_once __DIR__ . '/../includes/header.php';
     <a href="/cv-generator.php" class="btn btn-ghost">Modifier / recommencer</a>
   </div>
 
-  <div class="card" style="position:relative; overflow:hidden; padding:40px;">
-    <?php if (!$isPaid): ?>
-      <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none;">
-        <span style="transform:rotate(-30deg); font-size:3rem; font-weight:700; color:rgba(27,36,82,.08); font-family:var(--font-display); white-space:nowrap;">
-          APERÇU — <?= e(SITE_NAME) ?>
-        </span>
+  <?php if (!empty($data['rationale'])): ?>
+    <div class="cv-rationale"><strong>💡 Pourquoi ce CV te correspond :</strong> <?= e($data['rationale']) ?></div>
+  <?php endif; ?>
+
+  <div class="cv-card">
+    <div class="cv-header">
+      <?php if (!$isPaid): ?>
+        <div class="cv-watermark"><span>APERÇU — <?= e(SITE_NAME) ?></span></div>
+      <?php endif; ?>
+      <h2><?= e($data['full_name']) ?></h2>
+      <?php if (!empty($data['headline'])): ?><p class="cv-headline"><?= e($data['headline']) ?></p><?php endif; ?>
+    </div>
+
+    <div class="cv-body-grid">
+      <div class="cv-sidebar">
+        <h3>Contact</h3>
+        <?php if (!empty($data['email'])): ?><p class="cv-contact-line">✉ <?= e($data['email']) ?></p><?php endif; ?>
+        <?php if (!empty($data['phone'])): ?><p class="cv-contact-line">☎ <?= e($data['phone']) ?></p><?php endif; ?>
+        <?php if (!empty($data['location'])): ?><p class="cv-contact-line">📍 <?= e($data['location']) ?></p><?php endif; ?>
+        <?php if (!empty($data['linkedin'])): ?><p class="cv-contact-line">🔗 <?= e($data['linkedin']) ?></p><?php endif; ?>
+
+        <?php if (!empty($data['skills'])): ?>
+          <h3>Compétences</h3>
+          <?php foreach ($data['skills'] as $skill): ?>
+            <?php if (trim($skill) !== ''): ?><span class="cv-tag"><?= e($skill) ?></span><?php endif; ?>
+          <?php endforeach; ?>
+        <?php endif; ?>
+
+        <?php if (!empty($data['languages'])): ?>
+          <h3>Langues</h3>
+          <p class="meta"><?= nl2br(e($data['languages'])) ?></p>
+        <?php endif; ?>
       </div>
-    <?php endif; ?>
 
-    <h2 style="margin-bottom:2px;"><?= e($data['full_name']) ?></h2>
-    <?php if (!empty($data['headline'])): ?><p style="color:var(--coral); font-weight:600;"><?= e($data['headline']) ?></p><?php endif; ?>
-    <p class="meta" style="margin:6px 0 20px;">
-      <?= e($data['email']) ?><?= $data['phone'] ? ' · ' . e($data['phone']) : '' ?><?= $data['location'] ? ' · ' . e($data['location']) : '' ?>
-    </p>
+      <div class="cv-main">
+        <?php if (!empty($data['summary'])): ?>
+          <h3>Profil</h3>
+          <p style="margin-bottom:20px;"><?= nl2br(e($data['summary'])) ?></p>
+        <?php endif; ?>
 
-    <?php if (!empty($data['summary'])): ?>
-      <h3 style="border-bottom:2px solid var(--amber); padding-bottom:4px; margin-bottom:8px;">Profil</h3>
-      <p style="margin-bottom:20px;"><?= nl2br(e($data['summary'])) ?></p>
-    <?php endif; ?>
+        <?php if (!empty($data['experience'])): ?>
+          <h3>Expériences</h3>
+          <?php foreach ($data['experience'] as $exp): ?>
+            <div class="cv-item">
+              <p><strong><?= e($exp['title']) ?></strong> — <?= e($exp['company']) ?><br>
+              <span class="meta"><?= e($exp['period']) ?><?= $exp['city'] ? ' · ' . e($exp['city']) : '' ?></span></p>
+              <?php if ($exp['desc']): ?><p class="desc"><?= nl2br(e($exp['desc'])) ?></p><?php endif; ?>
+            </div>
+          <?php endforeach; ?>
+        <?php endif; ?>
 
-    <?php if (!empty($data['experience'])): ?>
-      <h3 style="border-bottom:2px solid var(--amber); padding-bottom:4px; margin-bottom:8px;">Expériences</h3>
-      <?php foreach ($data['experience'] as $exp): ?>
-        <p style="margin-bottom:4px;"><strong><?= e($exp['title']) ?></strong> — <?= e($exp['company']) ?>
-        <span class="meta"><?= e($exp['period']) ?><?= $exp['city'] ? ' · ' . e($exp['city']) : '' ?></span></p>
-        <?php if ($exp['desc']): ?><p style="margin-bottom:14px; font-size:.95rem;"><?= nl2br(e($exp['desc'])) ?></p><?php endif; ?>
-      <?php endforeach; ?>
-    <?php endif; ?>
-
-    <?php if (!empty($data['education'])): ?>
-      <h3 style="border-bottom:2px solid var(--amber); padding-bottom:4px; margin:16px 0 8px;">Formation</h3>
-      <?php foreach ($data['education'] as $edu): ?>
-        <p style="margin-bottom:8px;"><strong><?= e($edu['degree']) ?></strong> — <?= e($edu['school']) ?>
-        <span class="meta"><?= e($edu['years']) ?><?= $edu['city'] ? ' · ' . e($edu['city']) : '' ?></span></p>
-      <?php endforeach; ?>
-    <?php endif; ?>
-
-    <?php if (!empty($data['skills'])): ?>
-      <h3 style="border-bottom:2px solid var(--amber); padding-bottom:4px; margin:16px 0 8px;">Compétences</h3>
-      <p><?= e(implode(' · ', $data['skills'])) ?></p>
-    <?php endif; ?>
-
-    <?php if (!empty($data['languages'])): ?>
-      <h3 style="border-bottom:2px solid var(--amber); padding-bottom:4px; margin:16px 0 8px;">Langues</h3>
-      <p><?= e($data['languages']) ?></p>
-    <?php endif; ?>
+        <?php if (!empty($data['education'])): ?>
+          <h3>Formation</h3>
+          <?php foreach ($data['education'] as $edu): ?>
+            <div class="cv-item">
+              <p><strong><?= e($edu['degree']) ?></strong><br><?= e($edu['school']) ?><br>
+              <span class="meta"><?= e($edu['years']) ?><?= $edu['city'] ? ' · ' . e($edu['city']) : '' ?></span></p>
+            </div>
+          <?php endforeach; ?>
+        <?php endif; ?>
+      </div>
+    </div>
   </div>
 </div>
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

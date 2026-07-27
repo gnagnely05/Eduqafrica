@@ -258,3 +258,38 @@ textarea.form-control { resize: vertical; min-height: 120px; }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
+
+/* ---------- Aperçu CV (design deux colonnes, miroir du PDF) ---------- */
+.cv-card { border-radius: var(--radius-lg); overflow: hidden; border: 1px solid rgba(11,37,36,.1); background: var(--white); }
+.cv-header { background: var(--dark-teal); color: var(--white); padding: 32px 40px; position: relative; }
+.cv-header h2 { color: var(--white); margin: 0 0 4px; font-size: 1.5rem; }
+.cv-header .cv-headline { color: var(--amber); font-weight: 700; margin: 0; }
+.cv-watermark { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; overflow: hidden; }
+.cv-watermark span { transform: rotate(-30deg); font-size: 2.6rem; font-weight: 700; color: rgba(255,255,255,.08); white-space: nowrap; }
+.cv-body-grid { display: flex; flex-wrap: wrap; }
+.cv-sidebar { flex: 0 0 280px; background: var(--mint); padding: 28px; }
+.cv-main { flex: 1; min-width: 280px; padding: 28px 32px; }
+.cv-sidebar h3, .cv-main h3 {
+  font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--dark-teal);
+  border-bottom: 2px solid var(--amber); padding-bottom: 6px; margin: 22px 0 10px;
+}
+.cv-sidebar h3:first-child, .cv-main h3:first-child { margin-top: 0; }
+.cv-contact-line { font-size: .88rem; margin: 0 0 8px; word-break: break-word; }
+.cv-tag {
+  display: inline-block; background: var(--white); border: 1px solid var(--light-sage);
+  border-radius: 10px; padding: 3px 10px; font-size: .8rem; margin: 0 6px 6px 0;
+}
+.cv-item { margin-bottom: 12px; }
+.cv-item p { margin: 0; }
+.cv-item .meta { font-size: .82rem; }
+.cv-item .desc { font-size: .88rem; margin-top: 3px; }
+.cv-rationale {
+  background: var(--mint); border-left: 4px solid var(--amber); border-radius: 8px;
+  padding: 16px 20px; margin: 24px 0; font-size: .92rem;
+}
+.cv-rationale strong { color: var(--dark-teal); }
+@media (max-width: 640px) {
+  .cv-header { padding: 24px 24px; }
+  .cv-body-grid { flex-direction: column; }
+  .cv-sidebar { flex: none; }
+}

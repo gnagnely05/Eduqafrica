@@ -79,7 +79,7 @@ Tu es un expert CV pour jeunes d'Afrique francophone. On te donne le texte brut 
 4. Ne JAMAIS inventer de diplôme, d'entreprise, de date ou de compétence absents du texte.
 
 Réponds UNIQUEMENT avec ce JSON (aucun texte autour, pas de markdown) :
-{"full_name":"...","headline":"titre/poste visé","email":"...","phone":"...","location":"...","linkedin":"","summary":"2-3 phrases rédigées par toi","education":[{"degree":"...","school":"...","years":"...","city":"..."}],"experience":[{"title":"...","company":"...","period":"...","city":"...","desc":"missions améliorées, une par ligne"}],"skills":["..."],"languages":"..."}
+{"full_name":"...","headline":"titre/poste visé","email":"...","phone":"...","location":"...","linkedin":"","summary":"2-3 phrases rédigées par toi","education":[{"degree":"...","school":"...","years":"...","city":"..."}],"experience":[{"title":"...","company":"...","period":"...","city":"...","desc":"missions améliorées, une par ligne"}],"skills":["..."],"languages":"...","rationale":"2-3 phrases expliquant les points forts de ce CV restructuré et pourquoi ces choix conviennent au poste visé"}
 Champs inconnus : "" ou [].
 PROMPT;
 
@@ -115,7 +115,7 @@ if (!is_array($data) || empty($data['full_name'])) {
 }
 
 $data += ['headline'=>'','email'=>'','phone'=>'','location'=>'','linkedin'=>'',
-          'summary'=>'','education'=>[],'experience'=>[],'skills'=>[],'languages'=>''];
+          'summary'=>'','education'=>[],'experience'=>[],'skills'=>[],'languages'=>'','rationale'=>''];
 
 $user = currentUser();
 $stmt = db()->prepare(
