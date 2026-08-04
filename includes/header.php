@@ -13,6 +13,7 @@ $user = currentUser();
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light only">
 <meta name="google-adsense-account" content="ca-pub-5953146496728381">
 <title><?= e($pageTitle) ?> — <?= e(SITE_NAME) ?></title>
 <meta name="description" content="<?= e($pageDesc) ?>">

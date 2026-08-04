@@ -1,5 +1,6 @@
 /* eduqAfrica — design fidèle à la référence Sira IA */
 :root {
+  color-scheme: light only;
   --dark-teal: #0B2524;
   --near-black: #0A1414;
   --light-sage: #C9DEDB;
