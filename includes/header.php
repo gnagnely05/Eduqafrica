@@ -15,6 +15,7 @@ $user = currentUser();
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light only">
 <meta name="google-adsense-account" content="ca-pub-5953146496728381">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5953146496728381" crossorigin="anonymous"></script>
 <title><?= e($pageTitle) ?> — <?= e(SITE_NAME) ?></title>
 <meta name="description" content="<?= e($pageDesc) ?>">
 <link rel="canonical" href="<?= e(SITE_URL . strtok($_SERVER['REQUEST_URI'] ?? '/', '?')) ?>">
